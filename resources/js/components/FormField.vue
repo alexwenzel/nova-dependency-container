@@ -1,6 +1,6 @@
 <template>
-    <div v-if="dependenciesSatisfied" ref="meow">
-        <div v-for="childField in field.fields" ref="items">
+    <div v-if="dependenciesSatisfied">
+        <div v-for="childField in field.fields">
             <component
                 :is="'form-' + childField.component"
                 :errors="errors"
