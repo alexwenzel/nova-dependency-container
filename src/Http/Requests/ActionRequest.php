@@ -3,6 +3,7 @@
 namespace Alexwenzel\DependencyContainer\Http\Requests;
 
 use Alexwenzel\DependencyContainer\HasDependencies;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use Alexwenzel\DependencyContainer\DependencyContainer;
 use Laravel\Nova\Http\Requests\ActionRequest as NovaActionRequest;
 
@@ -20,7 +21,7 @@ class ActionRequest extends NovaActionRequest
     {
         $availableFields = [];
 
-        foreach ($this->action()->fields() as $field) {
+        foreach ($this->action()->fields($this->novaRequest()) as $field) {
             if ($field instanceof DependencyContainer) {
                 // do not add any fields for validation if container is not satisfied
                 if ($field->areDependenciesSatisfied($this)) {
@@ -40,4 +41,10 @@ class ActionRequest extends NovaActionRequest
             return $field->getCreationRules($this);
         })->all());
     }
+    
+    public function novaRequest() {
+        return new NovaRequest;
+    }
+
+    
 }
