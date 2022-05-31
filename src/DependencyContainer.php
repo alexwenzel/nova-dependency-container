@@ -4,6 +4,7 @@ namespace Alexwenzel\DependencyContainer;
 
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Illuminate\Support\Str;
 
 class DependencyContainer extends Field
 {

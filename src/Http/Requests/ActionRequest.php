@@ -44,7 +44,5 @@ class ActionRequest extends NovaActionRequest
     
     public function novaRequest() {
         return new NovaRequest;
-    }
-
-    
+    } 
 }
