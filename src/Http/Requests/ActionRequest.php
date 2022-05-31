@@ -21,7 +21,7 @@ class ActionRequest extends NovaActionRequest
     {
         $availableFields = [];
 
-        foreach ($this->action()->fields($this->novaRequest()) as $field) {
+        foreach ($this->action()->fields($this) as $field) {
             if ($field instanceof DependencyContainer) {
                 // do not add any fields for validation if container is not satisfied
                 if ($field->areDependenciesSatisfied($this)) {
