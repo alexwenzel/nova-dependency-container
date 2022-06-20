@@ -113,6 +113,38 @@ class DependencyContainer extends Field
     }
 
     /**
+     * Adds a dependency for in
+     *
+     * @param $field
+     * @param $array
+     * @return $this
+     */
+    public function dependsOnIn($field, $array)
+    {
+        return $this->withMeta([
+            'dependencies' => array_merge($this->meta['dependencies'], [
+                array_merge($this->getFieldLayout($field), ['in' => $array])
+            ])
+        ]);
+    }
+
+    /**
+     * Adds a dependency for not in
+     *
+     * @param $field
+     * @param $array
+     * @return $this
+     */
+    public function dependsOnNotIn($field, $array)
+    {
+        return $this->withMeta([
+            'dependencies' => array_merge($this->meta['dependencies'], [
+                array_merge($this->getFieldLayout($field), ['notin' => $array])
+            ])
+        ]);
+    }
+
+    /**
      * Get layout for a specified field. Dot notation will result in {field}.{property}. If no dot was found it will
      * result in {field}.{field}, as it was in previous versions by default.
      *
@@ -169,6 +201,16 @@ class DependencyContainer extends Field
             }
 
             if (array_key_exists('not', $dependency) && $resource->{$dependency['property']} != $dependency['not']) {
+                $this->meta['dependencies'][$index]['satisfied'] = true;
+                continue;
+            }
+
+            if (array_key_exists('in', $dependency) && in_array($resource->{$dependency['property']}, $dependency['in'])) {
+                $this->meta['dependencies'][$index]['satisfied'] = true;
+                continue;
+            }
+
+            if (array_key_exists('notin', $dependency) && !in_array($resource->{$dependency['property']}, $dependency['notin'])) {
                 $this->meta['dependencies'][$index]['satisfied'] = true;
                 continue;
             }
