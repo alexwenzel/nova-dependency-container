@@ -2,6 +2,7 @@
 
 namespace Alexwenzel\DependencyContainer;
 
+use Illuminate\Support\Arr;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Illuminate\Support\Str;
@@ -24,8 +25,8 @@ class DependencyContainer extends Field
      * DependencyContainer constructor.
      *
      * @param $fields
-     * @param  null  $attribute
-     * @param  null  $resolveCallback
+     * @param null $attribute
+     * @param null $resolveCallback
      */
     public function __construct($fields, $attribute = null, $resolveCallback = null)
     {
@@ -46,8 +47,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                $this->getFieldLayout($field, $value)
-            ])
+                $this->getFieldLayout($field, $value),
+            ]),
         ]);
     }
 
@@ -61,8 +62,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                array_merge($this->getFieldLayout($field), ['not' => $value])
-            ])
+                array_merge($this->getFieldLayout($field), ['not' => $value]),
+            ]),
         ]);
     }
 
@@ -76,8 +77,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                array_merge($this->getFieldLayout($field), ['empty' => true])
-            ])
+                array_merge($this->getFieldLayout($field), ['empty' => true]),
+            ]),
         ]);
     }
 
@@ -91,8 +92,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                array_merge($this->getFieldLayout($field), ['notEmpty' => true])
-            ])
+                array_merge($this->getFieldLayout($field), ['notEmpty' => true]),
+            ]),
         ]);
     }
 
@@ -107,8 +108,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                array_merge($this->getFieldLayout($field), ['nullOrZero' => true])
-            ])
+                array_merge($this->getFieldLayout($field), ['nullOrZero' => true]),
+            ]),
         ]);
     }
 
@@ -123,8 +124,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                array_merge($this->getFieldLayout($field), ['in' => $array])
-            ])
+                array_merge($this->getFieldLayout($field), ['in' => $array]),
+            ]),
         ]);
     }
 
@@ -139,8 +140,8 @@ class DependencyContainer extends Field
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
-                array_merge($this->getFieldLayout($field), ['notin' => $array])
-            ])
+                array_merge($this->getFieldLayout($field), ['notin' => $array]),
+            ]),
         ]);
     }
 
@@ -160,19 +161,19 @@ class DependencyContainer extends Field
         }
         return [
             // literal form input name
-            'field' => $field[0],
+            'field'    => $field[0],
             // property to compare
             'property' => $field[1],
             // value to compare
-            'value' => $value,
+            'value'    => $value,
         ];
     }
 
     /**
      * Resolve dependency fields for display
      *
-     * @param  mixed  $resource
-     * @param  null  $attribute
+     * @param mixed $resource
+     * @param null $attribute
      */
     public function resolveForDisplay($resource, $attribute = null)
     {
@@ -226,8 +227,8 @@ class DependencyContainer extends Field
                     continue;
                 }
                 // @todo: quickfix for MorphTo
-                $morphable_attribute = $resource->getAttribute($dependency['property'].'_type');
-                if ($morphable_attribute !== null && Str::endsWith($morphable_attribute, '\\'.$dependency['value'])) {
+                $morphable_attribute = $resource->getAttribute($dependency['property'] . '_type');
+                if ($morphable_attribute !== null && Str::endsWith($morphable_attribute, '\\' . $dependency['value'])) {
                     $this->meta['dependencies'][$index]['satisfied'] = true;
                     continue;
                 }
@@ -239,8 +240,8 @@ class DependencyContainer extends Field
     /**
      * Resolve dependency fields
      *
-     * @param  mixed  $resource
-     * @param  string  $attribute
+     * @param mixed $resource
+     * @param string $attribute
      * @return array|mixed
      */
     public function resolve($resource, $attribute = null)
@@ -255,10 +256,10 @@ class DependencyContainer extends Field
      *
      * @trace fill/fillForAction -> fillInto -> *
      *
-     * @param  NovaRequest  $request
+     * @param NovaRequest $request
      * @param $model
      * @param $attribute
-     * @param  null  $requestAttribute
+     * @param null $requestAttribute
      */
     public function fillInto(NovaRequest $request, $model, $attribute, $requestAttribute = null)
     {
@@ -270,7 +271,7 @@ class DependencyContainer extends Field
     /**
      * Checks whether to add validation rules
      *
-     * @param  NovaRequest  $request
+     * @param NovaRequest $request
      * @return bool
      */
     public function areDependenciesSatisfied(NovaRequest $request)
@@ -313,13 +314,17 @@ class DependencyContainer extends Field
     /**
      * Get a rule set based on field property name
      *
-     * @param  NovaRequest  $request
-     * @param  string  $propertyName
+     * @param NovaRequest $request
+     * @param string $propertyName
      * @return array
      */
     protected function getSituationalRulesSet(NovaRequest $request, string $propertyName = 'rules')
     {
         $fieldsRules = [$this->attribute => []];
+
+        // if dependencies are not satisfied
+        // or no fields as dependency exist
+        // return empty rules for dependency container
         if (!$this->areDependenciesSatisfied($request)
             || !isset($this->meta['fields'])
             || !is_array($this->meta['fields'])) {
@@ -328,18 +333,45 @@ class DependencyContainer extends Field
 
         /** @var Field $field */
         foreach ($this->meta['fields'] as $field) {
-            $fieldsRules[$field->attribute] = is_callable($field->{$propertyName})
-                ? call_user_func($field->{$propertyName}, $request)
-                : $field->{$propertyName};
+            // if field is DependencyContainer, then add rules from dependant fields
+            if ($field instanceof DependencyContainer && $propertyName === "rules") {
+                $fieldsRules[Str::random()] = $field->getRules($request);
+            } else {
+                $fieldsRules[$field->attribute] = is_callable($field->{$propertyName})
+                    ? call_user_func($field->{$propertyName}, $request)
+                    : $field->{$propertyName};
+            }
         }
 
-        return $fieldsRules;
+        // simplify nested rules to one level
+        return $this->array_simplify($fieldsRules);
+    }
+
+    /**
+     * @param $array
+     * @return array
+     */
+    protected function array_simplify($array): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (is_string($key) && is_array($value) && !empty($value)) {
+                if (count(array_filter(array_keys($value), 'is_string')) > 0) {
+                    $result = array_merge($result, $this->array_simplify($value));
+                } else {
+                    $result[$key] = $value;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
      * Get the validation rules for this field.
      *
-     * @param  NovaRequest  $request
+     * @param NovaRequest $request
      * @return array
      */
     public function getRules(NovaRequest $request)
@@ -350,7 +382,7 @@ class DependencyContainer extends Field
     /**
      * Get the creation rules for this field.
      *
-     * @param  NovaRequest  $request
+     * @param NovaRequest $request
      * @return array|string
      */
     public function getCreationRules(NovaRequest $request)
@@ -366,7 +398,7 @@ class DependencyContainer extends Field
     /**
      * Get the update rules for this field.
      *
-     * @param  NovaRequest  $request
+     * @param NovaRequest $request
      * @return array
      */
     public function getUpdateRules(NovaRequest $request)
