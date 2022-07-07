@@ -1,7 +1,12 @@
 # nova 4 dependency container
 
-A Laravel Nova 4 form container for grouping fields that depend on other field values. Dependencies can be set on any
-field type or value.
+A Laravel Nova 4 form container for grouping fields that depend on other field values. 
+Dependencies can be set on any field type or value.
+
+Features:
+
+- working form validation inside unlimited nested containers
+- support of ebess/advanced-nova-media-library
 
 This plugin is based on [epartment/nova-dependency-container](https://github.com/epartment/nova-dependency-container)
 and only supports **Nova 4.x** and **PHP 8.x**.
