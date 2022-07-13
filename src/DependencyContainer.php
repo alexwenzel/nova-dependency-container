@@ -2,6 +2,8 @@
 
 namespace Alexwenzel\DependencyContainer;
 
+use Aqjw\MedialibraryField\Fields\Medialibrary;
+use Aqjw\MedialibraryField\Fields\Support\MediaCollectionRules;
 use Illuminate\Support\Arr;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -346,8 +348,20 @@ class DependencyContainer extends Field
         foreach ($this->meta['fields'] as $field) {
             // if field is DependencyContainer, then add rules from dependant fields
             if ($field instanceof DependencyContainer && $propertyName === "rules") {
-                $fieldsRules[Str::random()] = $field->getRules($request);
-            } else {
+                $fieldsRules[Str::random()] = $field->getSituationalRulesSet($request, $propertyName);
+            }
+            elseif ($field instanceof Medialibrary) {
+                $rules = is_callable($field->{$propertyName})
+                    ? call_user_func($field->{$propertyName}, $request)
+                    : $field->{$propertyName};
+
+                $fieldsRules[$field->attribute] = MediaCollectionRules::make(
+                    $rules,
+                    $request,
+                    $field,
+                );
+            }
+            else {
                 $fieldsRules[$field->attribute] = is_callable($field->{$propertyName})
                     ? call_user_func($field->{$propertyName}, $request)
                     : $field->{$propertyName};
