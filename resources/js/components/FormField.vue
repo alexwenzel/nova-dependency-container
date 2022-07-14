@@ -69,8 +69,6 @@ export default {
                     // @todo: replace with `updateDependencyStatus(initial_value)` and let it resolve dependency state
                     this.dependencyValues[component.field.attribute] = initial_value;
                 }
-
-                this.registerDependencyWatchers(component)
             });
 
             if (callback !== null) {
@@ -164,7 +162,6 @@ export default {
                 })
             }
         }
-
     }
 }
 </script>
