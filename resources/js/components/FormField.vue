@@ -18,6 +18,7 @@
 
 import {FormField, HandlesValidationErrors} from 'laravel-nova'
 import {walk} from "../utils";
+import each from 'lodash/each';
 
 export default {
     mixins: [FormField, HandlesValidationErrors],
@@ -155,7 +156,7 @@ export default {
 
         fill(formData) {
             if (this.dependenciesSatisfied) {
-                _.each(this.field.fields, field => {
+                each(this.field.fields, field => {
                     if (field.fill) {
                         field.fill(formData)
                     }
