@@ -30,10 +30,6 @@ class FieldServiceProvider extends ServiceProvider
                 \Alexwenzel\DependencyContainer\Http\Controllers\ActionController::class
             );
         });
-
-        Nova::serving(function (ServingNova $event) {
-            Nova::script('nova-dependency-container', __DIR__.'/../dist/js/field.js');
-        });
     }
 
     /**
