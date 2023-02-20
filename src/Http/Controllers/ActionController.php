@@ -2,6 +2,7 @@
 
 namespace Alexwenzel\DependencyContainer\Http\Controllers;
 
+use Alexwenzel\DependencyContainer\ActionHasDependencies;
 use Alexwenzel\DependencyContainer\Http\Requests\ActionRequest;
 use Laravel\Nova\Http\Requests\ActionRequest as NovaActionRequest;
 use Laravel\Nova\Http\Controllers\ActionController as NovaActionController;
@@ -16,7 +17,11 @@ class ActionController extends NovaActionController
      */
     public function store(NovaActionRequest $request)
     {
-        $request = ActionRequest::createFrom($request);
+        $action = $request->action();
+
+        if (in_array(ActionHasDependencies::class, class_uses_recursive($action))) {
+            $request = ActionRequest::createFrom($request);
+        }
 
         return parent::store($request);
     }
