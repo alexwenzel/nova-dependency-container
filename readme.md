@@ -1,6 +1,6 @@
 # nova 4 dependency container
 
-A Laravel Nova 4 form container for grouping fields that depend on other field values. 
+A Laravel Nova 4 form container for grouping fields that depend on other field values.
 Dependencies can be set on any field type or value.
 
 Features:
@@ -221,6 +221,29 @@ DependencyContainer::make([
     Boolean::make('Visible', 'visible')
 ])
 ->dependsOn('commentable', 'Post') 
+```
+
+## Workaround for index or details page
+
+Use the field within resource methods `fieldsForCreate` or `fieldsForUpdate`:
+
+```php
+DependencyContainer::make([
+    Select::make('Parent name', 'parent_id')
+        ->options(...)
+])->dependsOn('code', 'column'),
+```
+
+To display some values on index or details page,
+use any field you like to display the value within resource methods `fieldsForIndex` or `fieldsForDetail`:
+
+```php
+Select::make('Parent name', 'parent_id')
+        ->options(...),
+        
+// OR
+
+Text::make('Parent name', 'parent_id'),
 ```
 
 ## License
