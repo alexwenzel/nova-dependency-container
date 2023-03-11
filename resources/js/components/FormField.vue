@@ -124,7 +124,7 @@ export default {
                     return;
                 }
 
-                if (dependency.hasOwnProperty('nullOrZero') && 1 < [undefined, null, 0, '0'].indexOf(dependencyValue)) {
+                if (dependency.hasOwnProperty('nullOrZero') && 1 < [undefined, null, 0, '0', ''].indexOf(dependencyValue)) {
                     this.dependenciesSatisfied = true;
                     return;
                 }
@@ -144,7 +144,13 @@ export default {
                     return;
                 }
 
-                if (dependency.hasOwnProperty('value') && dependencyValue == dependency.value) {
+                // perform this check only, if dependency has not other conditions applied
+                // like: empty,notEmpty,nullOrZero,not,in,notin
+                if (dependency.hasOwnProperty('value')
+                    && dependencyValue == dependency.value
+                    && !dependency.hasOwnProperty('in')
+                    && !dependency.hasOwnProperty('notin')
+                ) {
                     this.dependenciesSatisfied = true;
                     return;
                 }
