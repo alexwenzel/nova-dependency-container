@@ -94,7 +94,7 @@ export default {
         },
 
         componentIsDependency(component) {
-            if (component.field === undefined) {
+            if (!component.field) {
                 return false;
             }
 
