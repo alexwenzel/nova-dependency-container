@@ -26,7 +26,7 @@ class DependencyContainer extends Field
     /**
      * DependencyContainer constructor.
      *
-     * @param $fields
+     * @param      $fields
      * @param null $attribute
      * @param null $resolveCallback
      */
@@ -175,7 +175,7 @@ class DependencyContainer extends Field
      * Resolve dependency fields for display
      *
      * @param mixed $resource
-     * @param null $attribute
+     * @param null  $attribute
      */
     public function resolveForDisplay($resource, $attribute = null)
     {
@@ -242,7 +242,7 @@ class DependencyContainer extends Field
     /**
      * Resolve dependency fields
      *
-     * @param mixed $resource
+     * @param mixed  $resource
      * @param string $attribute
      * @return array|mixed
      */
@@ -259,9 +259,9 @@ class DependencyContainer extends Field
      * @trace fill/fillForAction -> fillInto -> *
      *
      * @param NovaRequest $request
-     * @param $model
-     * @param $attribute
-     * @param null $requestAttribute
+     * @param             $model
+     * @param             $attribute
+     * @param null        $requestAttribute
      */
     public function fillInto(NovaRequest $request, $model, $attribute, $requestAttribute = null)
     {
@@ -297,26 +297,45 @@ class DependencyContainer extends Field
         $satisfiedCounts = 0;
         foreach ($this->meta['dependencies'] as $index => $dependency) {
 
+            // dependsOnEmpty
             if (array_key_exists('empty', $dependency) && empty($request->has($dependency['property']))) {
                 $satisfiedCounts++;
             }
 
+            // dependsOnNotEmpty
             if (array_key_exists('notEmpty', $dependency) && !empty($request->has($dependency['property']))) {
                 $satisfiedCounts++;
             }
 
-            // inverted
-            if (array_key_exists('nullOrZero', $dependency) && in_array($request->get($dependency['property']),
-                    [null, 0, '0'], true)) {
+            // dependsOnNullOrZero
+            if (array_key_exists('nullOrZero', $dependency)
+                && in_array($request->get($dependency['property']), [null, 0, '0', ''], true)) {
                 $satisfiedCounts++;
             }
 
+            // dependsOnIn
+            if (array_key_exists('in', $dependency)
+                && in_array($request->get($dependency['property']), $dependency['in'])) {
+                $satisfiedCounts++;
+            }
+
+            // dependsOnNotIn
+            if (array_key_exists('notin', $dependency)
+                && !in_array($request->get($dependency['property']), $dependency['notin'])) {
+                $satisfiedCounts++;
+            }
+
+            // dependsOnNot
             if (array_key_exists('not', $dependency) && $dependency['not'] != $request->get($dependency['property'])) {
                 $satisfiedCounts++;
             }
 
-            if (array_key_exists('value',
-                    $dependency) && $dependency['value'] == $request->get($dependency['property'])) {
+            // dependsOn
+            if (array_key_exists('value', $dependency)
+                && !array_key_exists('in', $dependency)
+                && !array_key_exists('notin', $dependency)
+                && !array_key_exists('nullOrZero', $dependency)
+                && $dependency['value'] == $request->get($dependency['property'])) {
                 $satisfiedCounts++;
             }
         }
@@ -328,7 +347,7 @@ class DependencyContainer extends Field
      * Get a rule set based on field property name
      *
      * @param NovaRequest $request
-     * @param string $propertyName
+     * @param string      $propertyName
      * @return array
      */
     protected function getSituationalRulesSet(NovaRequest $request, string $propertyName = 'rules')
@@ -349,8 +368,7 @@ class DependencyContainer extends Field
             // if field is DependencyContainer, then add rules from dependant fields
             if ($field instanceof DependencyContainer && $propertyName === "rules") {
                 $fieldsRules[Str::random()] = $field->getSituationalRulesSet($request, $propertyName);
-            }
-            elseif ($field instanceof Medialibrary) {
+            } elseif ($field instanceof Medialibrary) {
                 $rules = is_callable($field->{$propertyName})
                     ? call_user_func($field->{$propertyName}, $request)
                     : $field->{$propertyName};
@@ -360,8 +378,7 @@ class DependencyContainer extends Field
                     $request,
                     $field,
                 );
-            }
-            else {
+            } else {
                 $fieldsRules[$field->attribute] = is_callable($field->{$propertyName})
                     ? call_user_func($field->{$propertyName}, $request)
                     : $field->{$propertyName};
