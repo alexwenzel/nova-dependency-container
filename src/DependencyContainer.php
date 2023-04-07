@@ -337,7 +337,7 @@ class DependencyContainer extends Field
                 && !array_key_exists('notin', $dependency)
                 && !array_key_exists('nullOrZero', $dependency)) {
                 if ($dependency['value'] instanceof BackedEnum) {
-                    if ($dependency['value']->tryFrom($request->get($dependency['property']))) {
+                    if ($dependency['value']->value == $request->get($dependency['property'])) {
                         $satisfiedCounts++;
                     }
                 } elseif ($dependency['value'] == $request->get($dependency['property'])) {
