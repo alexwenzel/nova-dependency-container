@@ -71,7 +71,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [laravel_nova__WEBPACK_IMPORTED_MODULE_0__.FormField, laravel_nova__WEBPACK_IMPORTED_MODULE_0__.HandlesValidationErrors],
-  props: ['resourceName', 'resourceId', 'field'],
+  props: ['resourceName', 'resourceId', 'field', 'formUniqueId'],
   mounted: function mounted() {
     this.registerDependencyWatchers(this.$root, function () {
       this.updateDependencyStatus();
@@ -137,6 +137,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       return attribute;
     },
     componentIsDependency: function componentIsDependency(component) {
+      if (component.formUniqueId !== this.formUniqueId) {
+        return false;
+      }
       if (!component.field) {
         return false;
       }
@@ -276,8 +279,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       field: childField,
       ref_for: true,
       ref: 'field-' + childField.attribute,
-      "show-help-text": childField.helpText != null
-    }, null, 8 /* PROPS */, ["errors", "resource-id", "resource-name", "field", "show-help-text"]))]);
+      "show-help-text": childField.helpText != null,
+      "form-unique-id": $props.formUniqueId
+    }, null, 8 /* PROPS */, ["errors", "resource-id", "resource-name", "field", "show-help-text", "form-unique-id"]))]);
   }), 256 /* UNKEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
 }
 
