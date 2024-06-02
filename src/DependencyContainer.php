@@ -4,6 +4,7 @@ namespace Alexwenzel\DependencyContainer;
 
 use Aqjw\MedialibraryField\Fields\Medialibrary;
 use Aqjw\MedialibraryField\Fields\Support\MediaCollectionRules;
+use BackedEnum;
 use Illuminate\Support\Arr;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -334,9 +335,14 @@ class DependencyContainer extends Field
             if (array_key_exists('value', $dependency)
                 && !array_key_exists('in', $dependency)
                 && !array_key_exists('notin', $dependency)
-                && !array_key_exists('nullOrZero', $dependency)
-                && $dependency['value'] == $request->get($dependency['property'])) {
-                $satisfiedCounts++;
+                && !array_key_exists('nullOrZero', $dependency)) {
+                if ($dependency['value'] instanceof BackedEnum) {
+                    if ($dependency['value']->value == $request->get($dependency['property'])) {
+                        $satisfiedCounts++;
+                    }
+                } elseif ($dependency['value'] == $request->get($dependency['property'])) {
+                    $satisfiedCounts++;
+                }
             }
         }
 
