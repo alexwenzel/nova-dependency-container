@@ -353,10 +353,10 @@ class DependencyContainer extends Field
      * Get a rule set based on field property name
      *
      * @param NovaRequest $request
-     * @param string      $propertyName
+     * @param string      $methodName
      * @return array
      */
-    protected function getSituationalRulesSet(NovaRequest $request, string $propertyName = 'rules')
+    protected function getSituationalRulesSet(NovaRequest $request, string $methodName = 'getRules')
     {
         $fieldsRules = [$this->attribute => []];
 
@@ -372,12 +372,10 @@ class DependencyContainer extends Field
         /** @var Field $field */
         foreach ($this->meta['fields'] as $field) {
             // if field is DependencyContainer, then add rules from dependant fields
-            if ($field instanceof DependencyContainer && $propertyName === "rules") {
-                $fieldsRules[Str::random()] = $field->getSituationalRulesSet($request, $propertyName);
+            if ($field instanceof DependencyContainer && $methodName === "getRules") {
+                $fieldsRules[Str::random()] = $field->getSituationalRulesSet($request, $methodName);
             } elseif ($field instanceof Medialibrary) {
-                $rules = is_callable($field->{$propertyName})
-                    ? call_user_func($field->{$propertyName}, $request)
-                    : $field->{$propertyName};
+                $rules = $field->{$methodName}($request);
 
                 $fieldsRules[$field->attribute] = MediaCollectionRules::make(
                     $rules,
@@ -385,9 +383,7 @@ class DependencyContainer extends Field
                     $field,
                 );
             } else {
-                $fieldsRules[$field->attribute] = is_callable($field->{$propertyName})
-                    ? call_user_func($field->{$propertyName}, $request)
-                    : $field->{$propertyName};
+                $fieldsRules[$field->attribute] = $field->{$methodName}($request);
             }
         }
 
@@ -435,7 +431,7 @@ class DependencyContainer extends Field
      */
     public function getCreationRules(NovaRequest $request)
     {
-        $fieldsRules = $this->getSituationalRulesSet($request, 'creationRules');
+        $fieldsRules = $this->getSituationalRulesSet($request, 'getCreationRules');
 
         return array_merge_recursive(
             $this->getRules($request),
@@ -451,7 +447,7 @@ class DependencyContainer extends Field
      */
     public function getUpdateRules(NovaRequest $request)
     {
-        $fieldsRules = $this->getSituationalRulesSet($request, 'updateRules');
+        $fieldsRules = $this->getSituationalRulesSet($request, 'getUpdateRules');
 
         return array_merge_recursive(
             $this->getRules($request),
