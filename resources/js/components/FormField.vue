@@ -9,7 +9,6 @@
                 :field="childField"
                 :ref="'field-' + childField.attribute"
                 :show-help-text="childField.helpText != null"
-                :form-unique-id="formUniqueId"
             />
         </div>
     </div>
@@ -23,7 +22,7 @@ import {walk} from "../utils";
 export default {
     mixins: [FormField, HandlesValidationErrors],
 
-    props: ['resourceName', 'resourceId', 'field', 'formUniqueId'],
+    props: ['resourceName', 'resourceId', 'field'],
 
     mounted() {
         this.registerDependencyWatchers(this.$root, function () {
@@ -95,10 +94,6 @@ export default {
         },
 
         componentIsDependency(component) {
-            if(component.formUniqueId !== this.formUniqueId) {
-              return false;
-            }
-
             if (!component.field) {
                 return false;
             }
