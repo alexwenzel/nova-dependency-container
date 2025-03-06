@@ -176,9 +176,9 @@ class DependencyContainer extends Field
      * Resolve dependency fields for display
      *
      * @param mixed $resource
-     * @param null  $attribute
+     * @param string|null $attribute
      */
-    public function resolveForDisplay($resource, $attribute = null)
+    public function resolveForDisplay($resource, ?string $attribute = null): void
     {
         foreach ($this->meta['fields'] as $field) {
             $field->resolveForDisplay($resource);
@@ -241,17 +241,14 @@ class DependencyContainer extends Field
     }
 
     /**
-     * Resolve dependency fields
+     * Resolve the field's value for display.
      *
-     * @param mixed  $resource
-     * @param string $attribute
-     * @return array|mixed
+     * @param mixed $resource
+     * @param string|null $attribute
      */
-    public function resolve($resource, $attribute = null)
+    public function resolve($resource, ?string $attribute = null): void
     {
-        foreach ($this->meta['fields'] as $field) {
-            $field->resolve($resource, $attribute);
-        }
+        parent::resolve($resource, $attribute);
     }
 
     /**
@@ -415,10 +412,10 @@ class DependencyContainer extends Field
     /**
      * Get the validation rules for this field.
      *
-     * @param NovaRequest $request
+     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      * @return array
      */
-    public function getRules(NovaRequest $request)
+    public function getRules(NovaRequest $request): array
     {
         return $this->getSituationalRulesSet($request);
     }
@@ -426,32 +423,22 @@ class DependencyContainer extends Field
     /**
      * Get the creation rules for this field.
      *
-     * @param NovaRequest $request
-     * @return array|string
+     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
+     * @return array
      */
-    public function getCreationRules(NovaRequest $request)
+    public function getCreationRules(NovaRequest $request): array
     {
-        $fieldsRules = $this->getSituationalRulesSet($request, 'getCreationRules');
-
-        return array_merge_recursive(
-            $this->getRules($request),
-            $fieldsRules
-        );
+        return $this->getSituationalRulesSet($request, 'getCreationRules');
     }
 
     /**
      * Get the update rules for this field.
      *
-     * @param NovaRequest $request
+     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      * @return array
      */
-    public function getUpdateRules(NovaRequest $request)
+    public function getUpdateRules(NovaRequest $request): array
     {
-        $fieldsRules = $this->getSituationalRulesSet($request, 'getUpdateRules');
-
-        return array_merge_recursive(
-            $this->getRules($request),
-            $fieldsRules
-        );
+        return $this->getSituationalRulesSet($request, 'getUpdateRules');
     }
 }

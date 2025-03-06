@@ -6,7 +6,7 @@ use Alexwenzel\DependencyContainer\ActionHasDependencies;
 use Alexwenzel\DependencyContainer\Http\Requests\ActionRequest;
 use Laravel\Nova\Http\Requests\ActionRequest as NovaActionRequest;
 use Laravel\Nova\Http\Controllers\ActionController as NovaActionController;
-
+use Illuminate\Http\Response;
 class ActionController extends NovaActionController
 {
     /**
@@ -15,7 +15,7 @@ class ActionController extends NovaActionController
      * @param  \Laravel\Nova\Http\Requests\ActionRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(NovaActionRequest $request)
+    public function store(NovaActionRequest $request) : Response
     {
         $action = $request->action();
 
