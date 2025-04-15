@@ -17,7 +17,7 @@ class ActionRequest extends NovaActionRequest
      *
      * @return void
      */
-    public function validateFields()
+    public function validateFields(): void
     {
         $availableFields = [];
 
@@ -41,8 +41,9 @@ class ActionRequest extends NovaActionRequest
             return $field->getCreationRules($this);
         })->all());
     }
-    
-    public function novaRequest() {
+
+    public function novaRequest(): NovaRequest
+    {
         return new NovaRequest;
-    } 
+    }
 }

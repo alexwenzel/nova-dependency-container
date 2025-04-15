@@ -10,7 +10,7 @@ trait HasChildFields
      * @param  [array] $childFields [meta fields]
      * @return void
      */
-    protected function extractChildFields($childFields)
+    protected function extractChildFields($childFields): void
     {
         foreach ($childFields as $childField) {
             if ($childField instanceof DependencyContainer) {

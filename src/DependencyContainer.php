@@ -46,7 +46,7 @@ class DependencyContainer extends Field
      * @param $value
      * @return $this
      */
-    public function dependsOn($field, $value)
+    public function dependsOn($field, $value): static
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -61,7 +61,7 @@ class DependencyContainer extends Field
      * @param $field
      * @return DependencyContainer
      */
-    public function dependsOnNot($field, $value)
+    public function dependsOnNot($field, $value): DependencyContainer
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -76,7 +76,7 @@ class DependencyContainer extends Field
      * @param $field
      * @return DependencyContainer
      */
-    public function dependsOnEmpty($field)
+    public function dependsOnEmpty($field): DependencyContainer
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -91,7 +91,7 @@ class DependencyContainer extends Field
      * @param $field
      * @return DependencyContainer
      */
-    public function dependsOnNotEmpty($field)
+    public function dependsOnNotEmpty($field): DependencyContainer
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -107,7 +107,7 @@ class DependencyContainer extends Field
      * @param $value
      * @return $this
      */
-    public function dependsOnNullOrZero($field)
+    public function dependsOnNullOrZero($field): static
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -123,7 +123,7 @@ class DependencyContainer extends Field
      * @param $array
      * @return $this
      */
-    public function dependsOnIn($field, $array)
+    public function dependsOnIn($field, $array): static
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -139,7 +139,7 @@ class DependencyContainer extends Field
      * @param $array
      * @return $this
      */
-    public function dependsOnNotIn($field, $array)
+    public function dependsOnNotIn($field, $array): static
     {
         return $this->withMeta([
             'dependencies' => array_merge($this->meta['dependencies'], [
@@ -156,7 +156,7 @@ class DependencyContainer extends Field
      * @param $value
      * @return array
      */
-    protected function getFieldLayout($field, $value = null)
+    protected function getFieldLayout($field, $value = null): array
     {
         if (count(($field = explode('.', $field))) === 1) {
             // backwards compatibility, property becomes field
@@ -178,7 +178,7 @@ class DependencyContainer extends Field
      * @param mixed $resource
      * @param null  $attribute
      */
-    public function resolveForDisplay($resource, $attribute = null)
+    public function resolveForDisplay($resource, $attribute = null): void
     {
         foreach ($this->meta['fields'] as $field) {
             $field->resolveForDisplay($resource);
@@ -247,7 +247,7 @@ class DependencyContainer extends Field
      * @param string $attribute
      * @return array|mixed
      */
-    public function resolve($resource, $attribute = null)
+    public function resolve($resource, $attribute = null): mixed
     {
         foreach ($this->meta['fields'] as $field) {
             $field->resolve($resource, $attribute);
@@ -264,7 +264,7 @@ class DependencyContainer extends Field
      * @param             $attribute
      * @param null        $requestAttribute
      */
-    public function fillInto(NovaRequest $request, $model, $attribute, $requestAttribute = null)
+    public function fillInto(NovaRequest $request, $model, $attribute, $requestAttribute = null): \Closure
     {
         $callbacks = [];
 
@@ -288,7 +288,7 @@ class DependencyContainer extends Field
      * @param NovaRequest $request
      * @return bool
      */
-    public function areDependenciesSatisfied(NovaRequest $request)
+    public function areDependenciesSatisfied(NovaRequest $request): bool
     {
         if (!isset($this->meta['dependencies'])
             || !is_array($this->meta['dependencies'])) {
@@ -356,7 +356,7 @@ class DependencyContainer extends Field
      * @param string      $methodName
      * @return array
      */
-    protected function getSituationalRulesSet(NovaRequest $request, string $methodName = 'getRules')
+    protected function getSituationalRulesSet(NovaRequest $request, string $methodName = 'getRules'): array
     {
         $fieldsRules = [$this->attribute => []];
 
@@ -418,7 +418,7 @@ class DependencyContainer extends Field
      * @param NovaRequest $request
      * @return array
      */
-    public function getRules(NovaRequest $request)
+    public function getRules(NovaRequest $request): array
     {
         return $this->getSituationalRulesSet($request);
     }
@@ -429,7 +429,7 @@ class DependencyContainer extends Field
      * @param NovaRequest $request
      * @return array|string
      */
-    public function getCreationRules(NovaRequest $request)
+    public function getCreationRules(NovaRequest $request): array|string
     {
         $fieldsRules = $this->getSituationalRulesSet($request, 'getCreationRules');
 
@@ -445,7 +445,7 @@ class DependencyContainer extends Field
      * @param NovaRequest $request
      * @return array
      */
-    public function getUpdateRules(NovaRequest $request)
+    public function getUpdateRules(NovaRequest $request): array
     {
         $fieldsRules = $this->getSituationalRulesSet($request, 'getUpdateRules');
 

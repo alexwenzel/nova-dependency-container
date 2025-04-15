@@ -15,7 +15,7 @@ trait HasDependencies
      * @param  NovaRequest  $request
      * @return FieldCollection
      */
-    public function availableFields(NovaRequest $request)
+    public function availableFields(NovaRequest $request): FieldCollection
     {
         $method = $this->fieldsMethod($request);
 
@@ -52,7 +52,7 @@ trait HasDependencies
      * @param  mixed  $model
      * @return bool
      */
-    protected function extractableRequest(NovaRequest $request, $model)
+    protected function extractableRequest(NovaRequest $request, $model): bool
     {
         // if form was submitted to update (method === 'PUT')
         if ($request->isUpdateOrUpdateAttachedRequest() && $request->method() == 'PUT') {
@@ -74,7 +74,7 @@ trait HasDependencies
      *
      * @todo: implement
      */
-    public function filterFieldForRequest($field, NovaRequest $request)
+    public function filterFieldForRequest($field, NovaRequest $request): mixed
     {
         // @todo: filter fields for request, e.g. show/hideOnIndex, create, update or whatever
         return $field;

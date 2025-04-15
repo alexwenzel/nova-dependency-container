@@ -15,7 +15,7 @@ class ActionController extends NovaActionController
      * @param  \Laravel\Nova\Http\Requests\ActionRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(NovaActionRequest $request)
+    public function store(NovaActionRequest $request): \Illuminate\Http\Response
     {
         $action = $request->action();
 
